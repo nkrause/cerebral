@@ -8,12 +8,15 @@
 import React from 'react';
 import {
   FlatList,
+  Platform,
   SafeAreaView,
   StyleSheet,
   View,
   Text,
   StatusBar,
 } from 'react-native';
+
+import Spacer from 'react-native-spacer';
 
 import { color } from './src/constants/global_colors';
 import { string } from './src/constants/global_strings';
@@ -176,10 +179,23 @@ class App extends React.Component {
     }
   }
 
+  /**
+   * Moves TextInput for iOS to above keyboard
+   */
+  getChatInput = () => {
+    const chatInput = <ChatInput questionId={this.state.questionNum} userInput={this.state.userInput} onChangeText={this.onChangeText} onSubmitText={this.onSubmitText} />;
+    return Platform.select({
+      android: chatInput,
+      ios: <Spacer spaceMargin={0}>{chatInput}</Spacer>,
+    });
+  }
+
   render() {
+    const chatInput = this.getChatInput();
     return (
       <View style={styles.container}>
         <StatusBar backgroundColor={color.LIGHT_GRAY} barStyle="dark-content" />
+        <SafeAreaView style={styles.statusBar} />
         <SafeAreaView style={styles.container}>
           <ChatHeader headerText={string.TECH_SUPPORT} />
           <FlatList<ChatMessage>
@@ -191,7 +207,7 @@ class App extends React.Component {
             renderItem={this.renderItem}
             showsVerticalScrollIndicator={false}
           />
-          <ChatInput questionId={this.state.questionNum} userInput={this.state.userInput} onChangeText={this.onChangeText} onSubmitText={this.onSubmitText} />
+          {chatInput}
         </SafeAreaView>
       </View>
     );
@@ -201,6 +217,10 @@ class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  statusBar: {
+    flex: 0,
+    backgroundColor: color.LIGHT_GRAY,
   },
 });
 
